@@ -1,0 +1,33 @@
+name: Surveillance Hub3E
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  verifier-offres:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les dependances
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Lancer la verification
+        env:
+          GMAIL_EXPEDITEUR: ${{ secrets.GMAIL_EXPEDITEUR }}
+          GMAIL_MOT_DE_PASSE_APPLICATION: ${{ secrets.GMAIL_MOT_DE_PASSE_APPLICATION }}
+          GMAIL_DESTINATAIRE: ${{ secrets.GMAIL_DESTINATAIRE }}
+        run: python surveillance_hub3e.py
